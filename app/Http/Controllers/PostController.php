@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\Response;
 
 class PostController extends Controller
@@ -30,14 +31,17 @@ class PostController extends Controller
     public function store(PostStoreRequest $request)
     {
         $inputs = $request->validated();
-
-        $inputs['image']->store('images', 'public');
-
-        $inputs['image'] = $inputs['image']->hashName();
+        if(!empty($inputs['image'])) {
+            $inputs['image']->store('images', 'public');
+            $inputs['image'] = $inputs['image']->hashName();
+        }
 
         $post = auth()->user()->posts()->create($inputs);
-        $post['image'] = asset('storage/images/'.$post['image']);
 
+        if(!empty($inputs['image'])) {
+            $post['image'] = asset('storage/images/'.$post['image']);
+        }
+    
         return response()->json(['the post has been created', $post], Response::HTTP_CREATED);
     }
 
@@ -49,9 +53,12 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        Post::where('id', $id)->delete();
-
-        return response()->json('', Response::HTTP_NO_CONTENT);
-    
+        $post = Post::all()->where('id', $id)->first();
+        
+        File::delete(public_path('storage/images/'.$post->image));
+        
+        $post = Post::where('id', $id)->delete();
+        
+        return response()->json('', Response::HTTP_NO_CONTENT);   
     }
 }
