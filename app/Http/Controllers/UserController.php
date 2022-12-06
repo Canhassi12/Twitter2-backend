@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\User\CreateUser;
 use App\Http\Requests\UserStoreRequest;
 use App\Models\User;
+use App\Repositories\Users\UsersRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -11,14 +13,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
+    private $users;
+
+    public function __construct(UsersRepository $users)
+    {
+        $this->users = $users;
+    }
+
     public function login(Request $request) {
         $credentials = $request->only('email', 'password');
         
         if (!Auth::attempt($credentials, true)) {
             return response()->json('Invalid email or password', Response::HTTP_UNAUTHORIZED);
-        }
+        } //refatorar
 
-        $user = User::where('email', $credentials['email'])->get();
+        $user = User::where('email', $credentials['email'])->get(); //refatorar
 
         return response()->json( [
             "message" => "Login successful",
@@ -27,22 +36,14 @@ class UserController extends Controller
         ], Response::HTTP_OK);
     }
    
-    public function register(UserStoreRequest $request)
+    public function register(UserStoreRequest $request, CreateUser $action)
     {
         $inputs = $request->validated();
 
-        $inputs['password'] = Hash::make($inputs['password']);
-
-        $user = User::create(
-            $inputs
-        );
-
-        $token = $user->createToken('AuthToken')->plainTextToken;
-
         return response()->json([
             'message'  => 'User has been created in database',
-            'token'    => $token,
-            'user'     => $user
+            'user'     =>  $user = $action->handle($inputs),
+            'token'    => $user->createToken('AuthToken')->plainTextToken,
         ], Response::HTTP_CREATED);
     }
 
