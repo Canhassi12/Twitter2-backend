@@ -20,7 +20,7 @@ class CommentController extends Controller
     {
         $inputs = $request->validated();
 
-        $post = Post::find($inputs['post_id']);
+        $post = Post::find($inputs['post_id']); //refatorar
 
         $post->comments()->create(['user_id' => auth()->user()->id,...$inputs]);
 
@@ -35,7 +35,7 @@ class CommentController extends Controller
      */
     public function destroy($id)
     {
-        Comment::where('id', $id)->delete();
+        Comment::where('id', $id)->delete(); //refatorar
 
         return response()->json('', Response::HTTP_NO_CONTENT);
     }

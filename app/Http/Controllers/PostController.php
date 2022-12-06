@@ -31,15 +31,15 @@ class PostController extends Controller
     public function store(PostStoreRequest $request)
     {
         $inputs = $request->validated();
-        if(!empty($inputs['image'])) {
+        if(!empty($inputs['image'])) { // refatorar
             $inputs['image']->store('images', 'public');
             $inputs['image'] = $inputs['image']->hashName();
         }
 
-        $post = auth()->user()->posts()->create($inputs);
+        $post = auth()->user()->posts()->create($inputs); 
 
         if(!empty($inputs['image'])) {
-            $post['image'] = asset('storage/images/'.$post['image']);
+            $post['image'] = asset('storage/images/'.$post['image']); //refatorar
         }
     
         return response()->json(['the post has been created', $post], Response::HTTP_CREATED);
@@ -53,11 +53,11 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        $post = Post::all()->where('id', $id)->first();
+        $post = Post::all()->where('id', $id)->first(); //refatorar
         
-        File::delete(public_path('storage/images/'.$post->image));
+        File::delete(public_path('storage/images/'.$post->image)); //refatorar
         
-        $post = Post::where('id', $id)->delete();
+        $post = Post::where('id', $id)->delete(); //refatorar
         
         return response()->json('', Response::HTTP_NO_CONTENT);   
     }
