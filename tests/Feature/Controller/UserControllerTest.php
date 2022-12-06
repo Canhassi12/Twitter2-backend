@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
@@ -25,7 +26,7 @@ class UserControllerTest extends TestCase
             'password'  => $user->password
         ]);
 
-        $response->assertStatus(201);
+        $response->assertStatus(Response::HTTP_CREATED);
         $response->assertCreated();
     }
 
@@ -63,7 +64,7 @@ class UserControllerTest extends TestCase
         ]);
 
         $this->post('/api/auth/logout')
-        ->assertStatus(204);
+        ->assertNoContent();
     }
 
 
