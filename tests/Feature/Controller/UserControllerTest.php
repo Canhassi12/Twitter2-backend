@@ -6,20 +6,18 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\Sanctum;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
-    /**
-     * @return void
-     * @test
-     */
-    public function Store_new_user()
+    
+    public function test_store_new_user()
     {
         $user = User::factory()->make();
 
-        $response = $this->post('/api/auth/register', [
+        $response = $this->post(route('user.store'), [
             'name'      => $user->name,
             'email'     => $user->email,
             'nick_name' => $user->nick_name,
@@ -30,42 +28,50 @@ class UserControllerTest extends TestCase
         $response->assertCreated();
     }
 
-    /**
-     * @return void
-     * @test
-     */
-    public function Login_a_user_with_successful() 
+    public function test_destroy_a_user()
     {
-        $password = 'aiiii';
+        $user = User::factory()->create();
 
-        $user = User::factory(['password' => Hash::make($password)])->create();
+        Sanctum::actingAs(
+            $user, 
+            ['*']
+        );
 
-        $response = $this->post('/api/auth/login', [
-            'email' => $user->email,
-            'password' => $password,
-        ]);
-
-        $response->assertOk();
+        $response = $this->delete(route('user.destroy',$user->id));
+        
+        $response->assertNoContent();
     }
 
-    /**
-     * @return void
-     * @test
-     */
-    public function logout_with_authenticated_user(): void
-    {
-        $password = 'aiiii';
+  
+    // public function Login_a_user_with_successful() 
+    // {
+    //     $password = 'aiiii';
 
-        $user = User::factory(['password' => Hash::make($password)])->create();
+    //     $user = User::factory(['password' => Hash::make($password)])->create();
 
-        $this->post('/api/auth/login', [
-            'email' => $user->email, 
-            'password' => $password,
-        ]);
+    //     $response = $this->post('/api/auth/login', [
+    //         'email' => $user->email,
+    //         'password' => $password,
+    //     ]);
 
-        $this->post('/api/auth/logout')
-        ->assertNoContent();
-    }
+    //     $response->assertOk();
+    // }
+
+
+    // public function logout_with_authenticated_user(): void
+    // {
+    //     $password = 'aiiii';
+
+    //     $user = User::factory(['password' => Hash::make($password)])->create();
+
+    //     $this->post('/api/auth/login', [
+    //         'email' => $user->email, 
+    //         'password' => $password,
+    //     ]);
+
+    //     $this->post('/api/auth/logout')
+    //     ->assertNoContent();
+    // }
 
 
 }

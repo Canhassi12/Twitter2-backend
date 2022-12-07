@@ -12,5 +12,10 @@ class UsersRepository {
         $inputs['password'] = Hash::make($inputs['password']);
         return User::create($inputs);
     }
+
+    public function delete($id)
+    {
+        return User::destroy($id);
+    }
 }
 
