@@ -14,21 +14,18 @@ class PostController extends Controller
         $this->post = $post;
     }
 
-
     public function index()
     {
        
     }
 
-    
     public function store(PostStoreRequest $request)
     {
         $this->post->create($request);
    
-        return response()->json(['the post has been created'], Response::HTTP_CREATED);
+        return response()->json('the post has been created', Response::HTTP_CREATED);
     }
 
-    
     public function destroy($id)
     {
         $this->post->delete($id);

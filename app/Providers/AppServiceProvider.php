@@ -32,6 +32,11 @@ class AppServiceProvider extends ServiceProvider
             'App\Repositories\Posts\PostsRepositoryInterface',
             'App\Repositories\Posts\PostsRepository'
         );
+
+        $this->app->bind(
+            'App\Repositories\Comments\CommentsRepositoryInterface',
+            'App\Repositories\Comments\CommentsRepository'
+        );
         
     }
 }
