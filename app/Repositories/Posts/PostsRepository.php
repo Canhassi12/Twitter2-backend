@@ -15,4 +15,9 @@ class PostsRepository implements PostsRepositoryInterface
     {
         return Post::where('id', $id)->first();
     }
+
+    public function getPosts()
+    {
+        return Post::paginate(20);
+    }
 }

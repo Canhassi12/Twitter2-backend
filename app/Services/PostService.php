@@ -46,4 +46,15 @@ class PostService
 
         $this->posts->delete($id);
     }
+
+    public function getPosts()
+    {
+        $posts = $this->posts->getPosts();
+
+        foreach ($posts as $post) {
+            $post->image = asset('storage/images/'.$post->image);
+        }
+        
+        return $posts;
+    }
 }
