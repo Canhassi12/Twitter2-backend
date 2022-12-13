@@ -4,8 +4,9 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Repositories\Users\UsersRepositoryInterface;
+use App\Services\VerifyUserCredentialsService;
 
-class AuthService implements AuthServiceInterface
+class AuthService
 {
     public function __construct(UsersRepositoryInterface $users)
     {

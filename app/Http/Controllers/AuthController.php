@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\Users\UsersRepositoryInterface;
-use App\Services\AuthServiceInterface;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
-    public function __construct(AuthServiceInterface $auth, UsersRepositoryInterface $users)
+    public function __construct(AuthService $auth)
     {
         $this->auth = $auth;
-        $this->users = $users;
     }
 
     public function login(Request $request): JsonResponse

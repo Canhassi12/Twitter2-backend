@@ -2,36 +2,34 @@
 
 namespace App\Providers;
 
+use App\Repositories\Posts\PostsRepository;
+use App\Repositories\Posts\PostsRepositoryInterface;
+use App\Services\PostService;
 use Illuminate\Support\ServiceProvider;
+use PostServiceInterface;
 
-class AppServiceProvider extends ServiceProvider
+class PostServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Register services.
      *
      * @return void
      */
     public function register()
     {
-        //
+       
     }
 
     /**
-     * Bootstrap any application services.
+     * Bootstrap services.
      *
      * @return void
      */
     public function boot()
     {
         $this->app->bind(
-            'App\Repositories\Users\UsersRepositoryInterface',
-            'App\Repositories\Users\UsersRepository'
-        );
-
-        $this->app->bind(
             'App\Repositories\Posts\PostsRepositoryInterface',
             'App\Repositories\Posts\PostsRepository'
         );
-        
     }
 }
