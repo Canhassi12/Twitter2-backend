@@ -14,7 +14,7 @@ class PostController extends Controller
         $this->post = $post;
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
        $posts = $this->post->getPosts();
 
@@ -28,7 +28,7 @@ class PostController extends Controller
         return response()->json('the post has been created', Response::HTTP_CREATED);
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         $this->post->delete($id);
                 

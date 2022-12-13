@@ -6,7 +6,6 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Http\Testing\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
@@ -42,7 +41,6 @@ class PostControllerTest extends TestCase
         $response->assertCreated();
     }   
 
-    
     public function test_delete_a_post_with_image() 
     {   
         $user = User::factory()->create();
@@ -73,5 +71,19 @@ class PostControllerTest extends TestCase
         $this->assertDatabaseEmpty('posts');
 
         $response->assertNoContent();
+    }
+
+    public function test_get_posts_to_paginate() 
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs(
+            $user, 
+            ['*']
+        );
+
+        $response = $this->get(route('post.index'));
+
+        $response->assertOk();
     }
 }

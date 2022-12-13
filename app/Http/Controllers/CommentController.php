@@ -24,7 +24,7 @@ class CommentController extends Controller
         return response()->json('the comment has been created', Response::HTTP_CREATED);
     }
   
-    public function destroy($id): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         $this->comment->delete($id);
 

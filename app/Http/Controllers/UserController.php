@@ -25,7 +25,7 @@ class UserController extends Controller
         ], Response::HTTP_CREATED);
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         $this->users->delete($id);
         return response()->json([], Response::HTTP_NO_CONTENT);
