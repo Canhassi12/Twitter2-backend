@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserStoreRequest;
 use App\Repositories\Users\UsersRepositoryInterface;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
@@ -13,7 +14,7 @@ class UserController extends Controller
         $this->users = $users;
     }
 
-    public function store(UserStoreRequest $request)
+    public function store(UserStoreRequest $request): JsonResponse
     {
         $inputs = $request->validated();
 
@@ -24,7 +25,7 @@ class UserController extends Controller
         ], Response::HTTP_CREATED);
     }
 
-    public function destroy($id) 
+    public function destroy($id): JsonResponse
     {
         $this->users->delete($id);
         return response()->json([], Response::HTTP_NO_CONTENT);

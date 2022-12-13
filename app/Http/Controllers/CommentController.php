@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CommentStoreRequest;
 use App\Models\Comment;
 use App\Services\CommentService;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class CommentController extends Controller
@@ -14,7 +15,7 @@ class CommentController extends Controller
         $this->comment = $comment;
     }
 
-    public function store(CommentStoreRequest $request)
+    public function store(CommentStoreRequest $request): JsonResponse
     {
         $inputs = $request->validated();
 
@@ -23,7 +24,7 @@ class CommentController extends Controller
         return response()->json('the comment has been created', Response::HTTP_CREATED);
     }
   
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         $this->comment->delete($id);
 
