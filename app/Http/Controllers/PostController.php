@@ -3,62 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostStoreRequest;
-use App\Models\Post;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
+use App\Services\PostService;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function __construct(PostService $post)
     {
-       
+        $this->post = $post;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(PostStoreRequest $request)
+    public function index(): JsonResponse
     {
-        $inputs = $request->validated();
-        if(!empty($inputs['image'])) {
-            $inputs['image']->store('images', 'public');
-            $inputs['image'] = $inputs['image']->hashName();
-        }
+       $posts = $this->post->getPosts();
 
-        $post = auth()->user()->posts()->create($inputs);
-
-        if(!empty($inputs['image'])) {
-            $post['image'] = asset('storage/images/'.$post['image']);
-        }
-    
-        return response()->json(['the post has been created', $post], Response::HTTP_CREATED);
+       return response()->json($posts, Response::HTTP_OK);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function store(PostStoreRequest $request): JsonResponse
     {
-        $post = Post::all()->where('id', $id)->first();
-        
-        File::delete(public_path('storage/images/'.$post->image));
-        
-        $post = Post::where('id', $id)->delete();
-        
-        return response()->json('', Response::HTTP_NO_CONTENT);   
+        $this->post->create($request);
+   
+        return response()->json('the post has been created', Response::HTTP_CREATED);
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        $this->post->delete($id);
+                
+        return response()->json([], Response::HTTP_NO_CONTENT);   
     }
 }

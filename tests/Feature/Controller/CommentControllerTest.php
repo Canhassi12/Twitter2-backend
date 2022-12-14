@@ -10,12 +10,7 @@ use Tests\TestCase;
 
 class CommentControllerTest extends TestCase
 {
-    /**
-     *
-     * @return void
-     * @test
-     */
-    public function store_a_comment_in_a_post()
+    public function test_store_a_comment_in_a_post()
     {
         $user = User::factory()->create();
 
@@ -31,21 +26,20 @@ class CommentControllerTest extends TestCase
         
         $post = auth()->user()->posts()->create($inputs);
 
-
         $response = $this->post(route('comment.store'), [
             'post_id' => $post->id,
             'comment' => "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nesciunt facilis nulla necessitatibus molestias impedit et vitae, ipsum nemo optio non explicabo velit delectus dignissimos quaerat? Enim labore eaque maxime?"
         ]);
 
+        $this->assertDatabaseHas('comments', [
+            'user_id' => $user->id,
+            'post_id' => $post->id,
+            'comment' => "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nesciunt facilis nulla necessitatibus molestias impedit et vitae, ipsum nemo optio non explicabo velit delectus dignissimos quaerat? Enim labore eaque maxime?"
+        ]);
         $response->assertCreated();
     }
 
-    /**
-     *
-     * @return void
-     * @test
-     */
-    public function delete_a_comment_of_post() 
+    public function test_delete_a_comment_of_post() 
     {
         $user = User::factory()->create();
 
@@ -62,6 +56,13 @@ class CommentControllerTest extends TestCase
         $post = auth()->user()->posts()->create($inputs);
 
         $response = $this->delete(route('comment.destroy', $post->id));
+
+        $this->assertDatabaseMissing('comments', [
+            'user_id' => $user->id,
+            'post_id' => $post->id,
+            'comment' => "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nesciunt facilis nulla necessitatibus molestias impedit et vitae, ipsum nemo optio non explicabo velit delectus dignissimos quaerat? Enim labore eaque maxime?"
+        ]);
+
         $response->assertNoContent();
     }
 }

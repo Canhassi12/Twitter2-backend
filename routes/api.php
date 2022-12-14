@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
@@ -22,9 +23,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::prefix('auth')->group(function() {
-    Route::post('/register', [UserController::class, 'register']);
-    Route::post('/login', [UserController::class, 'login']);
-    Route::middleware('auth:sanctum')->post('/logout', [UserController::class, 'logout']);
+    Route::post('/register', [UserController::class, 'store'])->name('user.store');
+    Route::middleware('auth:sanctum')->delete('/user/delete/{id}', [UserController::class, 'destroy'])->name('user.destroy');
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 Route::middleware('auth:sanctum')->apiResource('post', PostController::class);

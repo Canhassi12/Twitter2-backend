@@ -6,18 +6,14 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class PostControllerTest extends TestCase
 {
-    /**
-     *
-     * @return void
-     * @test
-     */
-    public function store_a_post_with_authenticated_user() 
+    public function test_store_a_post_with_image() 
     {
         $user = User::factory()->create();
 
@@ -26,19 +22,26 @@ class PostControllerTest extends TestCase
             ['*']
         );
 
+        Storage::fake('local');
+
         $response = $this->post(route('post.store'), [
             'text' => 'Lorem ipsum dolor sit amet, consectet vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv',
+            'image' => UploadedFile::fake()->image('photo1.jpg')
+        ]);
+
+        $post = Post::latest()->first();
+        
+        Storage::disk('local')->assertExists($post->image);
+
+        $this->assertDatabaseHas('posts', [
+            'text' => 'Lorem ipsum dolor sit amet, consectet vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv',
+            'image' => $post->image,
         ]);
 
         $response->assertCreated();
-    }
+    }   
 
-    /**
-     *
-     * @return void
-     * @test
-     */
-    public function delete_a_post() 
+    public function test_delete_a_post_with_image() 
     {   
         $user = User::factory()->create();
 
@@ -46,20 +49,41 @@ class PostControllerTest extends TestCase
             $user, 
             ['*']
         );
-        
+
+        Storage::fake('images');
+
         $inputs = [
             'text' => 'test',
             'id' => 2,
+            'image' => UploadedFile::fake()->image('photo1.jpg')->hashName(),
         ];
-        
+
         $post = auth()->user()->posts()->create($inputs);
 
         $response = $this->delete(route('post.destroy', $post->id), [
             'id' => $post->id,
-            'text' => $post->text,
-
         ]);
 
+        $post = Post::latest()->first();
+
+        Storage::disk('local')->assertDirectoryEmpty('stogare/images');
+
+        $this->assertDatabaseEmpty('posts');
+
         $response->assertNoContent();
+    }
+
+    public function test_get_posts_to_paginate() 
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs(
+            $user, 
+            ['*']
+        );
+
+        $response = $this->get(route('post.index'));
+
+        $response->assertOk();
     }
 }
