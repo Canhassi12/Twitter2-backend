@@ -19,7 +19,7 @@ class PostsRepository implements PostsRepositoryInterface
 
     public function getPosts()
     {
-        return Post::paginate(20);
+        return Post::all()->take(20);
     }
 
     public function getAllImagesFromUser(int $userID): Collection

@@ -34,7 +34,6 @@ class PostService
         foreach ($imagesName as $image) {
             File::delete(public_path('storage/images/'.$image));
         }
-        
     }
 
     public function create($request): void 
@@ -43,7 +42,9 @@ class PostService
         
         $inputs = $request->validated();
 
-        $inputs['image'] = $inputs['image']->hashName();
+        if (!empty($request['image'])) {
+            $inputs['image'] = $inputs['image']->hashName();    
+        }
 
         auth()->user()->posts()->create($inputs);       
     }

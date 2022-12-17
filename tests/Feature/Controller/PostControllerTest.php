@@ -13,6 +13,27 @@ use Tests\TestCase;
 
 class PostControllerTest extends TestCase
 {
+    public function test_store_a_post()
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs(
+            $user,
+            ['*']
+        );
+
+        $response = $this->post(route('post.store'), [
+            'text' => 'Lorem ipsum dolor sit amet, consectet vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv'
+        ]);
+
+        $this->assertDatabaseHas('posts', [
+            'text' => 'Lorem ipsum dolor sit amet, consectet vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv',
+            'image' => null
+        ]);
+
+        $response->assertCreated();
+    }
+
     public function test_store_a_post_with_image() 
     {
         $user = User::factory()->create();
@@ -73,6 +94,30 @@ class PostControllerTest extends TestCase
         $response->assertNoContent();
     }
 
+    public function test_delete_a_post() 
+    {   
+        $user = User::factory()->create();
+
+        Sanctum::actingAs(
+            $user, 
+            ['*']
+        );
+
+        $inputs = [
+            'text' => 'test',
+            'id' => 2,
+        ];
+
+        $post = auth()->user()->posts()->create($inputs);
+
+        $response = $this->delete(route('post.destroy', $post->id), [
+            'id' => $post->id,
+        ]);
+
+        $this->assertDatabaseEmpty('posts');
+        $response->assertNoContent();
+    }
+
     public function test_get_posts_to_paginate() 
     {
         $user = User::factory()->create();
@@ -82,8 +127,29 @@ class PostControllerTest extends TestCase
             ['*']
         );
 
-        $response = $this->get(route('post.index'));
+        $inputs = [
+            'text' => 'test',
+            'id' => 2,
+        ];
 
+        for ($i = -1; $i < 20; $i++) {
+            auth()->user()->posts()->create($inputs);
+        }
+
+        $response = $this->get(route('post.index'));
         $response->assertOk();
+        $response->assertJsonStructure([
+            "posts" => [
+                [
+                    "id",
+                    "text",
+                    "image",
+                    "user_id",
+                    "created_at",
+                    "updated_at"
+                ]
+            ]
+        ]);
+        $response->assertJsonCount(20, 'posts');    
     }
 }
