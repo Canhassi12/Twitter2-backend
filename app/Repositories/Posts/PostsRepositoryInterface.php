@@ -12,4 +12,6 @@ interface PostsRepositoryInterface
     public function findById($id): Post;
 
     public function getPosts();
+
+    public function getAllImagesFromUser(int $userID);
 }   

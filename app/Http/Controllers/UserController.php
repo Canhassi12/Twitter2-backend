@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserStoreRequest;
-use App\Repositories\Users\UsersRepositoryInterface;
+use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
-    public function __construct(UsersRepositoryInterface $users)
+    public function __construct(UserService $user)
     {
-        $this->users = $users;
+        $this->users = $user;
     }
 
     public function store(UserStoreRequest $request): JsonResponse
@@ -20,14 +20,13 @@ class UserController extends Controller
 
         return response()->json([
             'message'  => 'User has been created in database',
-            'user'     =>  $user = $this->users->create($inputs),
+            'user'     =>  $user = $this->users->store($inputs),
             'token'    => $user->createToken('AuthToken')->plainTextToken,
         ], Response::HTTP_CREATED);
     }
 
     public function destroy(int $id): JsonResponse
     {
-        $this->users->delete($id);
-        return response()->json([], Response::HTTP_NO_CONTENT);
+        return response()->json([$this->users->delete($id)], Response::HTTP_NO_CONTENT);
     }
 }
