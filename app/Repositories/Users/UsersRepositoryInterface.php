@@ -8,7 +8,11 @@ interface UsersRepositoryInterface
 {
     public function create(array $inputs): User;
 
-    public function delete($id);
+    public function delete(int $id): void;
 
     public function findByEmail(string $email): User;
+
+    public function getAllFollowersFromUserById(int $id);
+
+    public function followUser(int $id): void;
 }

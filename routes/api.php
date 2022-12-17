@@ -33,6 +33,10 @@ Route::middleware('auth:sanctum')->apiResource('post', PostController::class);
 
 Route::middleware('auth:sanctum')->apiResource('comment', CommentController::class);
 
+Route::middleware('auth:sanctum')->get('/user/{$id}/followers', [FollowerController::class]);
+Route::middleware('auth:sanctum')->post('/user/{$id}/followers', [FollowerController::class]);
+
+
 
 
      

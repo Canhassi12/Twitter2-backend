@@ -22,9 +22,19 @@ class PostService
         }
     }
 
-    private function deleteImagesFromPublicFolder(Post $post): void 
+    private function deleteImageFromPublicFolder(Post $post): void 
     {
         File::delete(public_path('storage/images/'.$post->image));
+    }
+    
+    public function deleteAllImagesFromUserinPublicFolder(int $userID) 
+    {
+        $imagesName = $this->posts->getAllImagesFromUser($userID);
+        
+        foreach ($imagesName as $image) {
+            File::delete(public_path('storage/images/'.$image));
+        }
+        
     }
 
     public function create($request): void 
@@ -42,7 +52,7 @@ class PostService
     {
         $post = $this->posts->findById($id);
 
-        $this->deleteImagesFromPublicFolder($post);
+        $this->deleteImageFromPublicFolder($post);
 
         $this->posts->delete($id);
     }

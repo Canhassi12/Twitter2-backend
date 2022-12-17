@@ -16,9 +16,7 @@ class PostController extends Controller
 
     public function index(): JsonResponse
     {
-       $posts = $this->post->getPosts();
-
-       return response()->json($posts, Response::HTTP_OK);
+       return response()->json(["posts" => $this->post->getPosts()], Response::HTTP_OK);
     }
 
     public function store(PostStoreRequest $request): JsonResponse
@@ -30,8 +28,6 @@ class PostController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
-        $this->post->delete($id);
-                
-        return response()->json([], Response::HTTP_NO_CONTENT);   
+        return response()->json([$this->post->delete($id)], Response::HTTP_NO_CONTENT);   
     }
 }

@@ -37,6 +37,5 @@ class AppServiceProvider extends ServiceProvider
             'App\Repositories\Comments\CommentsRepositoryInterface',
             'App\Repositories\Comments\CommentsRepository'
         );
-        
     }
 }
