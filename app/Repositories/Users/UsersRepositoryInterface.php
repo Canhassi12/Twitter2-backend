@@ -3,6 +3,7 @@
 namespace App\Repositories\Users;
 
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 interface UsersRepositoryInterface
 {
@@ -12,7 +13,7 @@ interface UsersRepositoryInterface
 
     public function findByEmail(string $email): User;
 
-    public function getAllFollowersFromUserById(int $id);
+    public function getAllFollowersFromUserById(int $id): Collection;
 
     public function followUser(int $id): void;
 }

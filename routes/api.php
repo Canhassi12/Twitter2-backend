@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FollowerController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -29,12 +30,12 @@ Route::prefix('auth')->group(function() {
     Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-Route::middleware('auth:sanctum')->apiResource('post', PostController::class);
+Route::middleware('auth:sanctum')->post('follow/{id}', [FollowerController::class, 'followUser'])->name('follow.user');
+Route::middleware('auth:sanctum')->get('/user/{id}/followers', [FollowerController::class, 'showFollowers'])->name('follow.show');
 
+Route::middleware('auth:sanctum')->apiResource('post', PostController::class);
 Route::middleware('auth:sanctum')->apiResource('comment', CommentController::class);
 
-Route::middleware('auth:sanctum')->get('/user/{$id}/followers', [FollowerController::class]);
-Route::middleware('auth:sanctum')->post('/user/{$id}/followers', [FollowerController::class]);
 
 
 

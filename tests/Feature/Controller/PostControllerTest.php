@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Controller;
 
+use App\Exceptions\PostException;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -116,6 +118,48 @@ class PostControllerTest extends TestCase
 
         $this->assertDatabaseEmpty('posts');
         $response->assertNoContent();
+    }
+
+    public function test_delete_a_post_with_incorrect_post_Id()
+    {
+        $user = User::factory()->create(); 
+
+        Sanctum::actingAs(
+            $user, 
+            ['*']
+        );
+
+        $inputs = [
+            'text' => 'test',
+            'id' => 999,
+        ];
+
+        auth()->user()->posts()->create($inputs);
+
+        $exception = PostException::invalidPostId(777);
+
+        $response = $this->delete(route('post.destroy', 777));
+
+        $response->assertStatus($exception->getCode());
+        $response->assertSee($exception->getMessage());     
+    }
+    
+    public function test_get_an_inconsistent_post_in_the_database() 
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs(
+            $user, 
+            ['*']
+        );
+
+        $exception = PostException::noPosts();
+
+        $response = $this->get(route('post.index'));
+
+        $this->assertDatabaseEmpty('posts');
+        $response->assertStatus($exception->getCode());
+        $response->assertSee($exception->getMessage());
     }
 
     public function test_get_posts_to_paginate() 

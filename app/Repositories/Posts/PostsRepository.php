@@ -3,7 +3,10 @@
 namespace App\Repositories\Posts;
 
 use App\Models\Post;
+use Exception;
 use Illuminate\Support\Collection;
+
+use function PHPUnit\Framework\isEmpty;
 
 class PostsRepository implements PostsRepositoryInterface
 {
@@ -12,14 +15,16 @@ class PostsRepository implements PostsRepositoryInterface
         Post::destroy($id);
     }
 
-    public function findById($id): Post
+    public function findById($id): ?Post
     {
         return Post::where('id', $id)->first();
     }
 
     public function getPosts()
     {
-        return Post::all()->take(20);
+        if(!Post::all()->take(20)->isempty()) {
+            return Post::all()->take(20);
+        }    
     }
 
     public function getAllImagesFromUser(int $userID): Collection

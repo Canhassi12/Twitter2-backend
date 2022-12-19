@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Exceptions\UserException;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -46,6 +47,23 @@ class UserControllerTest extends TestCase
         
         $response->assertNoContent();
         $this->assertDatabaseEmpty('users');
+    }
+
+    public function test_exception_delete_user_with_invalid_id()
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs(
+            $user, 
+            ['*']
+        );
+
+        $exception = UserException::invalidUserId(777);
+
+        $response = $this->delete(route('user.destroy', 777));
+
+        $response->assertStatus($exception->getCode());
+        $response->assertSee($exception->getMessage());
     }
 
     public function test_destroy_a_user_and_delete_your_images_from_public()

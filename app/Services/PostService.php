@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Exceptions\PostException;
 use App\Models\Post;
 use App\Repositories\Posts\PostsRepositoryInterface;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,7 +19,6 @@ class PostService
     private function storeImagesInPublicFolder($request): void
     {
         if (!empty($request['image'])) {
-
             Storage::disk('local')->putFile('', $request['image']); //refactor 
         }
     }
@@ -27,7 +28,7 @@ class PostService
         File::delete(public_path('storage/images/'.$post->image));
     }
     
-    public function deleteAllImagesFromUserinPublicFolder(int $userID) 
+    public function deleteAllImagesFromUserinPublicFolder(int $userID): void
     {
         $imagesName = $this->posts->getAllImagesFromUser($userID);
         
@@ -50,18 +51,24 @@ class PostService
     }
 
     public function delete(int $id): void
-    {
-        $post = $this->posts->findById($id);
+    { 
+        if(!$post = $this->posts->findById($id)) {
+            throw PostException::invalidPostId($id);
+        }
 
-        $this->deleteImageFromPublicFolder($post);
+        if($post->image) {
+            $this->deleteImageFromPublicFolder($post);
+        }
 
         $this->posts->delete($id);
     }
 
-    public function getPosts()
+    public function getPosts(): Collection
     {
-        $posts = $this->posts->getPosts();
-
+        if (!$posts = $this->posts->getPosts()) {
+            throw PostException::noPosts();
+        }
+      
         foreach ($posts as $post) {
             $post->image = asset('storage/images/'.$post->image);
         }

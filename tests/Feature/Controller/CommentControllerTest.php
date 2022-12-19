@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Controller;
 
+use App\Exceptions\CommentException;
+use App\Exceptions\PostException;
+use App\Models\Comment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -39,6 +42,43 @@ class CommentControllerTest extends TestCase
         $response->assertCreated();
     }
 
+    public function test_exception_create_a_post_with_invalid_post_id()
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs(
+            $user, 
+            ['*']
+        );
+        
+        $response = $this->post(route('comment.store'), [
+            'post_id' => 777,
+            'comment' => "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nesciunt facilis nulla necessitatibus molestias impedit et vitae, ipsum nemo optio non explicabo velit delectus dignissimos quaerat? Enim labore eaque maxime?"
+        ]);
+
+        $exception = PostException::invalidPostId(777);
+
+        $response->assertStatus($exception->getCode());
+        $response->assertSee($exception->getMessage());       
+    }
+
+    public function test_exception_delete_a_comment_with_invalid_id()
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs(
+            $user, 
+            ['*']
+        );
+      
+        $exception = CommentException::invalidCommentId(777);
+
+        $response = $this->delete(route('comment.destroy', 777));
+
+        $response->assertStatus($exception->getCode());
+        $response->assertSee($exception->getMessage());
+    }
+
     public function test_delete_a_comment_of_post() 
     {
         $user = User::factory()->create();
@@ -55,7 +95,9 @@ class CommentControllerTest extends TestCase
         
         $post = auth()->user()->posts()->create($inputs);
 
-        $response = $this->delete(route('comment.destroy', $post->id));
+        $comment = Comment::factory(["user_id" => $user->id, "post_id" => $post->id])->create();
+
+        $response = $this->delete(route('comment.destroy', $comment->id));
 
         $this->assertDatabaseMissing('comments', [
             'user_id' => $user->id,
@@ -64,5 +106,6 @@ class CommentControllerTest extends TestCase
         ]);
 
         $response->assertNoContent();
+        $this->assertDatabaseEmpty('comments');
     }
 }

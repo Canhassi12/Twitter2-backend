@@ -2,8 +2,11 @@
 
 namespace App\Services;
 
+use App\Exceptions\UserException;
+use App\Models\User;
 use App\Repositories\Posts\PostsRepositoryInterface;
 use App\Repositories\Users\UsersRepositoryInterface;
+use Illuminate\Support\Collection;
 
 class UserService
 {
@@ -13,7 +16,17 @@ class UserService
         $this->postService = $postService;
     }
 
-    public function store($inputs)
+    private function getUsers($followers)
+    {
+        if (!$this->users->getUsers($followers)) 
+        {
+            throw UserException::noUsers();
+        }
+
+        return $this->users->getUsers($followers);
+    }
+
+    public function store($inputs): User
     {
         return $this->users->create($inputs);
     }
@@ -21,16 +34,19 @@ class UserService
     public function delete(int $id): void
     {
         $this->postService->deleteAllImagesFromUserinPublicFolder($id);
-        $this->users->delete($id);
+
+        $this->users->delete($id);     
     }
 
     public function getAllFollowersFromUser(int $id)
-    {
-        return $this->users->getAllFollowersFromUserById($id);
+    { 
+        $followers = $this->users->getAllFollowersFromUserById($id);
+        
+        return $this->getUsers($followers);
     }
 
     public function followUser(int $id): void
     {
-        $this->users->followUser($id);
+       $this->users->followUser($id);
     }
 }

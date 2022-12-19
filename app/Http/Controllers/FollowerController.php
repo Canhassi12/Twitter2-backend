@@ -16,13 +16,13 @@ class FollowerController extends Controller
 
     public function showFollowers($id): JsonResponse
     {
-       return response()->json(["followers" => $this->user->getAllFollowersFromUser($id)], Response::HTTP_OK);
+       $followers = $this->user->getAllFollowersFromUser($id);
+        return response()->json($followers, Response::HTTP_OK);
     }
 
     public function followUser($id): JsonResponse
     {
-        return response()->json([$this->user->followUser($id)], Response::HTTP_OK);
+        $this->user->followUser($id);
+        return response()->json([], Response::HTTP_OK);
     }
-
-    
 }

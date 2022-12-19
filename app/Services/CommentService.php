@@ -2,8 +2,11 @@
 
 namespace App\Services;
 
+use App\Exceptions\CommentException;
+use App\Exceptions\PostException;
 use App\Repositories\Comments\CommentsRepositoryInterface;
 use App\Repositories\Posts\PostsRepositoryInterface;
+use Exception;
 
 class CommentService {
 
@@ -15,13 +18,19 @@ class CommentService {
 
     public function create($inputs) 
     {
-        $post = $this->posts->findById($inputs['post_id']);
+        if (empty($post = $this->posts->findById($inputs['post_id']))) {
+            throw PostException::invalidPostId($inputs['post_id']);
+        }
 
         $post->comments()->create(['user_id' => auth()->user()->id,...$inputs]);
     }
 
     public function delete(int $id): void
     {
+        if (empty($this->comments->findById($id))) {
+            throw CommentException::invalidCommentId($id);
+        }
+
         $this->comments->delete($id);
     }
 }
