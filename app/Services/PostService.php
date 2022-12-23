@@ -75,4 +75,19 @@ class PostService
         
         return $posts;
     }
+
+    public function likePost(int $id): Post
+    {
+        if (!$post = $this->posts->findById($id)) {
+            throw PostException::invalidPostId($id);
+        }
+
+       
+        $post->likes()->create([
+            'user_id' => auth()->user()->id,
+            'id_like' => $id,
+        ]);
+
+        return $post;
+    }
 }

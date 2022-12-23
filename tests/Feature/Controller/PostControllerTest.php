@@ -196,4 +196,30 @@ class PostControllerTest extends TestCase
         ]);
         $response->assertJsonCount(20, 'posts');    
     }
+
+    // public function test_user_should_like_a_user()
+    // {
+    //     $user = User::factory()->create();
+
+    //     Sanctum::actingAs(
+    //         $user, 
+    //         ['*']
+    //     );
+
+    //     $inputs = [
+    //         'text' => 'test',
+    //         'id' => 2,
+    //     ];
+
+    //     $post = auth()->user()->posts()->create($inputs);
+
+    //     $response = $this->post(route("post.like", $post->id));
+
+    //     $response->assertCreated();
+    //     $this->assertDatabaseHas("likes", [
+    //         "user_id" => $user->id,
+    //         "post_id" => $post->id
+    //     ]);
+    // }
+
 }

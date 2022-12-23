@@ -34,6 +34,7 @@ Route::middleware('auth:sanctum')->post('follow/{id}', [FollowerController::clas
 Route::middleware('auth:sanctum')->get('/user/{id}/followers', [FollowerController::class, 'showFollowers'])->name('follow.show');
 
 Route::middleware('auth:sanctum')->apiResource('post', PostController::class);
+Route::middleware('auth:sanctum')->post('post/{id}/like', [PostController::class, 'likePost'])->name('post.like');
 Route::middleware('auth:sanctum')->apiResource('comment', CommentController::class);
 
 

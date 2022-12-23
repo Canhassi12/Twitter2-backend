@@ -30,4 +30,9 @@ class PostController extends Controller
     {
         return response()->json([$this->post->delete($id)], Response::HTTP_NO_CONTENT);   
     }
+
+    public function likePost(int $id): JsonResponse
+    {
+        return response()->json($this->post->likePost($id), Response::HTTP_OK);
+    }
 }
